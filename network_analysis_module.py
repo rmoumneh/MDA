@@ -2,12 +2,18 @@
 import pandas as pd
 import numpy as np
 from geopy.geocoders import Nominatim
-import matplotlib
+# import matplotlib
 from geopy.distance import geodesic
 from shapely.geometry import Point, MultiPoint
 from shapely.ops import nearest_points
 from datetime import datetime, timedelta, date
 import math
+import requests
+import zipfile
+import geopandas as gpd
+import os
+from shapely.geometry import Point, Polygon
+import random
 
 
 # ADD LOCATION COORDONATE TO AED DATAFRAME
@@ -29,7 +35,7 @@ def locationBE(numberStr, address, Arrondissement):
         latitude,longitude [float,float]
     """
     try:
-        geolocator = Nominatim(user_agent="my_user_agent")
+        geolocator = Nominatim(user_agent="my_user")
         street = numberStr+' '+address
         city = Arrondissement
         country = 'Belgique'
@@ -196,7 +202,7 @@ def AED_access(coordonate, AED_positions):
 # Au-delà de 5 minutes d’arrêt du cœur,les lésions cérébrales sont irréversibles. Au-delà de 12 minutes, c’est la mort
 # Le taux de survie en cas de défibrillation immédiate est de 75%
 
-def survival_chance(coordonate):
+def survival_chance(coordonate, departures, mean_speed_kmpsec, AED_positions):
     """
     Return survival chance in percent if a cardiac arrest occurs at the coordonate location
 
@@ -205,8 +211,8 @@ def survival_chance(coordonate):
     Output : 
         survival chance in percent
     """
-    time_interv = time_for_intervention(coordonate) #in seconds
-    distance_AED, access = AED_access(coordonate) # in km
+    time_interv = time_for_intervention(coordonate, departures, mean_speed_kmpsec) #in seconds
+    distance_AED, access = AED_access(coordonate, AED_positions) # in km
     human_walk = 5/(3600) # in km/sec (equivalent to 5 km/heure)
     initial_survival = 90 # % chance of survival, see https://sofia.medicalistes.fr/spip/spip.php?article174
     if access:
@@ -222,3 +228,122 @@ def survival_chance(coordonate):
         return survival
     
     
+def arrival_duration(date1,date2):
+    """
+        return the time in second between the start of the operator call and the ambulance arrival
+
+    Input : 
+        date1 = date type data of the operator call [date]
+        date2 = date type data of the arrival [date]
+    Output :
+        time in seconds [float]
+    """
+    duration = date2 - date1
+    duration_sec = duration.total_seconds()
+    return duration_sec
+
+
+def time_interv1(date_string):
+    try:
+        date_str,other = date_string.split(".")
+        useless,UTCoffset=other.split(" ")
+        UTCoffset = UTCoffset.replace(':','')
+        date_value = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        if UTCoffset[0] == '+':
+            date_value = date_value + timedelta(hours=int(UTCoffset[1:3]))
+        else:
+            date_value = date_value - timedelta(hours=int(UTCoffset[1:3]))
+    except:
+          date_value=date(1, 1, 1)#Define default value to remove, other function didn't work
+    return date_value
+
+def time_interv2(date_string):
+        try:
+            date_value=datetime.strptime(date_string, "%d%b%y:%H:%M:%S")
+        except:
+            date_value=date(1, 1, 1)#Define default value to remove, other function didn't work
+        return date_value 
+
+def time_interv3(date_string):
+    try:
+        date_str,other = date_string.split(".")
+        date_value = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+    except:
+          date_value=date(1, 1, 1)#Define default value to remove, other function didn't work
+    return date_value
+
+def streetnumber(number):
+    """ 
+    Return string format of the input
+
+    Input:
+        number = street number [float]
+    Output:
+        string of the street number [string]
+    """
+    if not math.isnan(number):
+        newnumber = str(int(number))
+    else:
+        newnumber = ''
+    return newnumber
+
+def datafram_survival_commune(n_point, shapefile_path = 'BELGIUM_Municipalities.shx', name_filpath ='BELGIUM_-_Municipalities.csv'):
+    #https://hub.arcgis.com/datasets/9589d9e5e5904f1ea8d245b54f51b4fd/explore
+    # shapefile_path = 'BELGIUM_Municipalities.shx'
+    municipalities_polygon = gpd.read_file(shapefile_path)
+    muni_name = pd.read_csv(name_filpath, sep=',')
+    municipality_df = pd.merge(municipalities_polygon, muni_name , left_index=True, right_index=True)
+
+    # NAME_3,VARNAME_3
+    df = pd.DataFrame(columns=['Municipality', 'Index', 'Latitude', 'Longitude', 'Survival chance'])
+    index = 0
+    for polygon in municipality_df['geometry']:
+        minx, miny, maxx, maxy = polygon.bounds
+        i = 0
+        commune = municipality_df['Communes'].iloc[index]
+        while i < n_point:
+            random_point = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
+            if polygon.contains(random_point):
+                i+=1
+                lon = random_point.x
+                lat = random_point.y
+                surv_chance = nam.survival_chance((lat,lon), departures, mean_speed_kmpsec, AED_positions)
+                new_row = {'Municipality': commune ,'Index': index, 'Latitude': lat, 'Longitude': lon, 'Survival chance': surv_chance}
+                # Inserting the new row
+                df.loc[len(df)] = new_row
+                # Reset the index
+                df = df.reset_index(drop=True) 
+        index+=1
+        # print(index)
+    return df
+
+def datafram_survival_arrond(n_point, mean_speed_kmpsec, AED_positions, shapefile_path = 'BELGIUM_-_Arrondissements.shx', name_filpath ='BELGIUM_-_Arrondissements.csv'):
+    #https://hub.arcgis.com/datasets/df9e6a90a6534d83a83589883afff0d8_0/explore?location=50.494149%2C4.492960%2C8.40
+    municipalities_polygon = gpd.read_file(shapefile_path)
+    muni_name = pd.read_csv(name_filpath, sep=',')
+    municipality_df = pd.merge(municipalities_polygon, muni_name , left_index=True, right_index=True)
+
+    # NAME_3,VARNAME_3
+    df = pd.DataFrame(columns=['Arrondisement_FR','Arrondisement_NL', 'Index', 'Latitude', 'Longitude', 'Survival chance'])
+    index = 0
+    for polygon in municipality_df['geometry']:
+        minx, miny, maxx, maxy = polygon.bounds
+        i = 0
+        communeFR = municipality_df['NAME_3'].iloc[index]
+        communeNL = municipality_df['VARNAME_3'].iloc[index]
+        while i < n_point:
+            random_point = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
+            if polygon.contains(random_point):
+                i+=1
+                lon = random_point.x
+                lat = random_point.y
+                # print(lat,lon)
+                surv_chance = survival_chance((lat,lon), departures, mean_speed_kmpsec, AED_positions)
+                new_row = {'Arrondisement_FR': communeFR,'Arrondisement_NL':communeNL ,'Index': index, 'Latitude': lat, 'Longitude': lon, 'Survival chance': surv_chance}
+                # Inserting the new row
+                df.loc[len(df)] = new_row
+                # Reset the index
+                df = df.reset_index(drop=True) 
+        index+=1
+        # print(index)
+    return df
