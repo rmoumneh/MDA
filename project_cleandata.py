@@ -10,6 +10,48 @@ from datetime import datetime, timedelta, date
 import math
 import network_analysis_module as nam
 
+
+###################
+### POSTAL CODE ###
+###################
+
+### Import data ###
+postal_codes = pd.read_parquet('PostalCodesBE .parquet')
+
+### Cleaining Postal Code ###
+postal_codes.head()
+for index, value in postal_codes.iterrows():
+    if postal_codes.at[index,'reg_name_fr'] == 'Région flamande':
+        postal_codes.at[index,'Region'] = 'Flanders'
+        postal_codes.at[index,'Province'] = postal_codes.at[index,'prov_name_nl']
+        postal_codes.at[index,'Arrondissement'] = postal_codes.at[index,'arr_name_nl']
+        postal_codes.at[index,'Municipality'] = postal_codes.at[index,'mun_name_nl']
+    elif postal_codes.at[index,'reg_name_fr'] == 'Région wallonne':
+        postal_codes.at[index,'Region'] = 'Wallonia'
+        postal_codes.at[index,'Province'] = postal_codes.at[index,'prov_name_fr']
+        postal_codes.at[index,'Arrondissement'] = postal_codes.at[index,'arr_name_fr']
+        postal_codes.at[index,'Municipality'] = postal_codes.at[index,'mun_name_fr']
+    elif postal_codes.at[index,'reg_name_fr'] == 'Région de Bruxelles-Capitale':
+        postal_codes.at[index,'Region'] = 'Brussels'
+        postal_codes.at[index,'Province'] = postal_codes.at[index,'prov_name_fr']
+        postal_codes.at[index,'Arrondissement'] = postal_codes.at[index,'arr_name_fr']
+        postal_codes.at[index,'Municipality'] = postal_codes.at[index,'mun_name_fr']
+    else:
+        postal_codes.at[index,'Region'] = 'None'
+        postal_codes.at[index,'Province'] = 'None'
+        postal_codes.at[index,'Arrondissement'] = 'None'
+        postal_codes.at[index,'Municipality'] = 'None'
+
+for a, b in zip(postal_codes.columns, range(0,len(postal_codes.columns))):
+                print(f'{a}, column number {b}')
+postal_codes_subset = postal_codes.iloc[:,[2,4,5,6,7,8,26,27,28,29]]
+postal_codes_subset.head()
+
+postal_codes_subset = postal_codes.iloc[:,[2,4,5,6,7,8,26,27,28,29]]
+
+### Save the datatable ###
+postal_codes_subset.to_csv('postal_codes.csv', index=False)
+
 #############################
 ### INTERVENTION CLEANING ###
 #############################
