@@ -1,0 +1,44 @@
+﻿OBJECTID,CodeINS,NAME_3,VARNAME_3,LongName
+1,11000,Antwerpen,Anvers,Arrondissement d'Anvers
+2,12000,Mechelen,Malines,Arrondissement de Malines
+3,13000,Turnhout,Turnhout,Arrondissement de Turnhout
+4,21000,Brussel,Bruxelles-Capitale,Arrondissement de Bruxelles-Capitale
+5,23000,Halle-Vilvoorde,Hal-Vilvorde,Arrondissement de Hal-Vilvorde
+6,24000,Leuven,Louvain,Arrondissement de Louvain
+7,25000,Nijvel,Nivelles,Arrondissement de Nivelles
+8,31000,Brugge,Bruges,Arrondissement de Bruges
+9,32000,Diksmuide,Dixmude,Arrondissement de Dixmude
+10,33000,Ieper,Ypres,Arrondissement d'Ypres
+11,34000,Kortrijk,Courtrai,Arrondissement de Courtrai
+12,35000,Oostende,Ostende,Arrondissement d'Ostende
+13,36000,Roeselare,Roulers,Arrondissement de Roulers
+14,37000,Tielt,Tielt,Arrondissement de Tielt
+15,38000,Veurne,Furnes,Arrondissement de Furnes
+16,41000,Aalst,Alost,Arrondissement d'Alost
+17,42000,Dendermonde,Termonde,Arrondissement de Termonde
+18,43000,Eeklo,Eeklo,Arrondissement d'Eeklo
+19,44000,Gent,Gand,Arrondissement de Gand
+20,45000,Oudenaarde,Audenarde,Arrondissement d'Audenarde
+21,46000,Sint-Niklaas,Saint-Nicolas,Arrondissement de Saint-Nicolas
+22,51000,Aat,Ath,Arrondissement d'Ath
+23,52000,Charleroi,Charleroi,Arrondissement de Charleroi
+24,53000,Bergen,Mons,Arrondissement de Mons
+25,54000,Moeskroen,Mouscron,Arrondissement de Mouscron
+26,55000,Zinnik,Soignies,Arrondissement de Soignies
+27,56000,Thuin,Thuin,Arrondissement de Thuin
+28,57000,Doornik,Tournai,Arrondissement de Tournai
+29,61000,Hoei,Huy,Arrondissement de Huy
+30,62000,Luik,Liège,Arrondissement de Liège
+31,63000,Verviers,Verviers,Arrondissement de Verviers
+32,64000,Borgworm,Waremme,Arrondissement de Waremme
+33,71000,Hasselt,Hasselt,Arrondissement de Hasselt
+34,72000,Maaseik,Maaseik,Arrondissement de Maaseik
+35,73000,Tongeren,Tongres,Arrondissement de Tongres
+36,81000,Aarlen,Arlon,Arrondissement d'Arlon
+37,82000,Bastenaken,Bastogne,Arrondissement de Bastogne
+38,83000,Marche-en-Famenne,Marche-en-Famenne,Arrondissement de Marche-en-Famenne
+39,84000,Neufchâteau,Neufchâteau,Arrondissement de Neufchâteau
+40,85000,Virton,Virton,Arrondissement de Virton
+41,91000,Dinant,Dinant,Arrondissement de Dinant
+42,92000,Namen,Namur,Arrondissement de Namur
+43,93000,Philippeville,Philippeville,Arrondissement de Philippeville
