@@ -8,9 +8,19 @@ import math
 from sklearn.cluster import DBSCAN
 import os
 from preprocess import load_data
-
+import datetime
 
 np.seterr(divide="ignore")
+
+def initialize_directory(path):
+    """
+    Initialize a directory recursively if it does not exist.
+
+    Args:
+    - path (str): Path of the directory to initialize.
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 class U_node:
@@ -184,8 +194,11 @@ def create_graph(U, V, save_graph=None):
     G.add_weighted_edges_from(edges)
 
     if save_graph:
-        nx.write_graphml(G, f"{save_graph}.graphml")  # TODO
-        nx.write_gexf(G, f"{save_graph}.gexf")
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        directory_path = "../../runs/{}/".format(timestamp)
+        initialize_directory(directory_path)
+        nx.write_graphml(G, f"../../runs/{timestamp}/{save_graph}.graphml")  # TODO
+        # nx.write_gexf(G, f"../../runs/{timestamp}/{save_graph}.gexf")
 
     return G
 

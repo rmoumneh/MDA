@@ -89,3 +89,4 @@ wcwidth==0.2.13
 Werkzeug==3.0.3
 xyzservices==2024.4.0
 zipp==3.19.0
+tqdm

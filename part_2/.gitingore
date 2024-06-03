@@ -1,0 +1,25 @@
+# Ignore the runs/ directory
+runs/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore log files
+logs/
+*.log
+
+# Ignore environment files
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore virtual environment
+.venv/
